@@ -11,17 +11,23 @@ $("checkout").min = dateValue(tomorrow); $("checkout").value = dateValue(tomorro
 $("checkin").addEventListener("change",()=>{const d=new Date($("checkin").value+"T00:00:00");d.setDate(d.getDate()+1);$("checkout").min=dateValue(d);if($("checkout").value<dateValue(d))$("checkout").value=dateValue(d)});
 let selectedRoom = null;
 function nights(){return Math.max(1,Math.round((new Date($("checkout").value+"T00:00:00")-new Date($("checkin").value+"T00:00:00"))/86400000))}
+function datesOverlap(existingBooking,checkin,checkout){return existingBooking.checkin<checkout&&existingBooking.checkout>checkin}
+function isRoomAvailable(roomId,checkin=$("checkin").value,checkout=$("checkout").value){
+  if(!checkin||!checkout||checkout<=checkin)return false;
+  return !getBookings().some(booking=>booking.roomId===roomId&&datesOverlap(booking,checkin,checkout));
+}
 function renderRooms(){
   const guests=Number($("guests").value);
   $("roomGrid").innerHTML=rooms.filter(r=>r.capacity>=guests).map(r=>`
     <article class="room-card"><div class="room-visual" style="background:${r.color}"><span class="tag">${r.tag}</span><span class="emoji">${r.emoji}</span></div>
     <div class="room-info"><h3>${r.name}</h3><p class="muted">${r.type}</p><div class="room-meta"><span>♙ Up to ${r.capacity} guests</span><span>✦ ${r.features[0]}</span></div>
-    <div class="room-bottom"><div class="price">₹${r.price.toLocaleString("en-IN")}<small> / night</small></div><button class="book-btn" data-book="${r.id}">Book room →</button></div></div></article>`).join("") || '<p class="empty-state">No rooms match that guest count. Try fewer guests.</p>';
+    <div class="room-bottom"><div class="price">₹${r.price.toLocaleString("en-IN")}<small> / night</small></div><button class="book-btn" data-book="${r.id}" ${isRoomAvailable(r.id)?"":"disabled"}>${isRoomAvailable(r.id)?"Book room →":"Unavailable"}</button></div></div></article>`).join("") || '<p class="empty-state">No rooms match that guest count. Try fewer guests.</p>';
   document.querySelectorAll("[data-book]").forEach(btn=>btn.addEventListener("click",()=>openBooking(btn.dataset.book)));
 }
 function getBookings(){return JSON.parse(localStorage.getItem("stayease-bookings")||"[]")}
 function saveBookings(items){localStorage.setItem("stayease-bookings",JSON.stringify(items))}
 function openBooking(id){
+  if(!isRoomAvailable(id)){showToast("This room is unavailable for the selected dates.");renderRooms();return;}
   selectedRoom=rooms.find(r=>r.id===id);$("selectedRoomId").value=id;
   $("dialogRoomName").textContent=selectedRoom.name;
   $("dialogSummary").textContent=`${nights()} night(s) · ${$("guests").value} guest(s) · Total ₹${(selectedRoom.price*nights()).toLocaleString("en-IN")}`;
@@ -30,8 +36,9 @@ function openBooking(id){
 $("closeDialog").addEventListener("click",()=>$("bookingDialog").close());
 $("bookingForm").addEventListener("submit",e=>{
   e.preventDefault();if(!$("bookingForm").reportValidity())return;
+  if(!selectedRoom||!isRoomAvailable(selectedRoom.id)){showToast("That room was just booked for the selected dates. Please choose another room.");renderRooms();return;}
   const booking={id:Date.now().toString(),roomId:selectedRoom.id,room:selectedRoom.name,name:$("guestName").value.trim(),email:$("guestEmail").value.trim(),checkin:$("checkin").value,checkout:$("checkout").value,guests:Number($("guests").value),total:selectedRoom.price*nights()};
-  const bookings=getBookings();bookings.unshift(booking);saveBookings(bookings);$("bookingDialog").close();$("bookingForm").reset();renderBookings();showToast("Your room has been booked. Enjoy your stay!");$("my-bookings").scrollIntoView({behavior:"smooth"});
+  const bookings=getBookings();bookings.unshift(booking);saveBookings(bookings);$("bookingDialog").close();$("bookingForm").reset();renderRooms();renderBookings();showToast("Your room has been booked. Enjoy your stay!");$("my-bookings").scrollIntoView({behavior:"smooth"});
 });
 function renderBookings(){
   const bookings=getBookings();
