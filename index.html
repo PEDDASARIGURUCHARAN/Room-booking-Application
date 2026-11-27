@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StayEase | Room Booking</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#"><span class="brand-mark">S</span> StayEase</a>
+    <nav><a href="#rooms">Rooms</a><a href="#my-bookings">My bookings</a></nav>
+    <a class="nav-cta" href="#rooms">Book a room</a>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">YOUR NEXT STAY STARTS HERE</p>
+        <h1>Find a room.<br><span>Feel at home.</span></h1>
+        <p class="hero-text">Thoughtfully selected rooms for work trips, weekend escapes, and everything in between.</p>
+        <a class="primary-btn" href="#rooms">Explore rooms <span>↗</span></a>
+      </div>
+      <div class="hero-art" aria-label="Illustration of a comfortable hotel room">
+        <div class="sun"></div><div class="plant">♧</div>
+        <div class="art-window"><div></div></div>
+        <div class="art-bed"><div class="pillow"></div><div class="blanket"></div></div>
+        <div class="art-table"><div class="lamp"></div></div>
+        <div class="art-caption">A little space to unwind.</div>
+      </div>
+    </section>
+
+    <section class="search-panel" aria-label="Search rooms">
+      <div class="field"><label for="checkin">CHECK IN</label><input type="date" id="checkin"></div>
+      <div class="field"><label for="checkout">CHECK OUT</label><input type="date" id="checkout"></div>
+      <div class="field"><label for="guests">GUESTS</label><select id="guests"><option value="1">1 guest</option><option value="2" selected>2 guests</option><option value="3">3 guests</option><option value="4">4 guests</option></select></div>
+      <button class="search-btn" id="searchBtn">Find rooms</button>
+    </section>
+
+    <section class="section" id="rooms">
+      <div class="section-heading"><div><p class="eyebrow">STAY YOUR WAY</p><h2>Rooms made for you</h2></div><p class="muted">Choose a space that suits your plans.</p></div>
+      <div class="room-grid" id="roomGrid"></div>
+    </section>
+
+    <section class="booking-section" id="my-bookings">
+      <div class="section-heading"><div><p class="eyebrow">YOUR TRIP DETAILS</p><h2>My bookings</h2></div><p class="muted">Your reservations are saved in this browser.</p></div>
+      <div id="bookingList" class="booking-list"><p class="empty-state">You haven't made any bookings yet.</p></div>
+    </section>
+  </main>
+
+  <footer><span class="brand"><span class="brand-mark">S</span> StayEase</span><span>Made for better stays · Room Booking Demo</span></footer>
+
+  <dialog id="bookingDialog">
+    <form id="bookingForm" method="dialog">
+      <button type="button" class="close-btn" id="closeDialog" aria-label="Close">×</button>
+      <p class="eyebrow">CONFIRM YOUR STAY</p>
+      <h2 id="dialogRoomName">Book your room</h2>
+      <p id="dialogSummary" class="muted"></p>
+      <input type="hidden" id="selectedRoomId">
+      <label for="guestName">Full name</label><input id="guestName" type="text" placeholder="Your name" required>
+      <label for="guestEmail">Email address</label><input id="guestEmail" type="email" placeholder="you@example.com" required>
+      <button class="primary-btn full-btn" type="submit">Confirm booking</button>
+    </form>
+  </dialog>
+  <div id="toast" class="toast" role="status"></div>
+  <script src="script.js"></script>
+</body>
+</html>
