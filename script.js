@@ -10,7 +10,12 @@ $("checkin").min = dateValue(today); $("checkin").value = dateValue(today);
 $("checkout").min = dateValue(tomorrow); $("checkout").value = dateValue(tomorrow);
 $("checkin").addEventListener("change",()=>{const d=new Date($("checkin").value+"T00:00:00");d.setDate(d.getDate()+1);$("checkout").min=dateValue(d);if($("checkout").value<dateValue(d))$("checkout").value=dateValue(d)});
 let selectedRoom = null;
-function nights(){return Math.max(1,Math.round((new Date($("checkout").value+"T00:00:00")-new Date($("checkin").value+"T00:00:00"))/86400000))}
+function nights(){
+  const startDate=new Date($("checkin").value+"T00:00:00");
+  const endDate=new Date($("checkout").value+"T00:00:00");
+  const millisecondsPerDay=24*60*60*1000;
+  return Math.max(1,Math.round((endDate-startDate)/millisecondsPerDay));
+}
 function renderRooms(){
   const guests=Number($("guests").value);
   $("roomGrid").innerHTML=rooms.filter(r=>r.capacity>=guests).map(r=>`
