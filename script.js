@@ -10,7 +10,12 @@ $("checkin").min = dateValue(today); $("checkin").value = dateValue(today);
 $("checkout").min = dateValue(tomorrow); $("checkout").value = dateValue(tomorrow);
 $("checkin").addEventListener("change",()=>{const d=new Date($("checkin").value+"T00:00:00");d.setDate(d.getDate()+1);$("checkout").min=dateValue(d);if($("checkout").value<dateValue(d))$("checkout").value=dateValue(d)});
 let selectedRoom = null;
-function nights(){return Math.max(1,Math.round((new Date($("checkout").value+"T00:00:00")-new Date($("checkin").value+"T00:00:00"))/86400000))}
+function nights(){
+  const checkin=new Date($("checkin").value+"T00:00:00");
+  const checkout=new Date($("checkout").value+"T00:00:00");
+  const stayLength=Math.ceil((checkout-checkin)/86400000);
+  return Math.max(1,stayLength);
+}
 function datesOverlap(existingBooking,checkin,checkout){return existingBooking.checkin<checkout&&existingBooking.checkout>checkin}
 function isRoomAvailable(roomId,checkin=$("checkin").value,checkout=$("checkout").value){
   if(!checkin||!checkout||checkout<=checkin)return false;
